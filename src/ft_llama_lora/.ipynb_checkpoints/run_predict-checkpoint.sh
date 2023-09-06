@@ -8,11 +8,11 @@ data_path="/mnt/workspace/PromptCBLUE-data"
 dataset_cache_dir=$data_path/"hf_datasets_cache"
 output_dir="./checkpoints_llama2"
 pretrained_model="/mnt/workspace/dataroot/models/michaelwzhu/Chinese-LlaMA2-chat-7B-sft-v0.3"
+peft_path="./output/promptcblue-llama-7b-pt-v0/checkpoint-2400"
 per_device_batch_size=1
 gradient_accumulation_steps=16
 training_steps=2400 # about 1epoch
-output_dir="./output/promptcblue-llama-7b-pt-v0"
-checkpoint="./output/promptcblue-llama-7b-pt-v0/checkpoint-1600"
+output_dir="./output/promptcblue-llama-7b-pt-v0/"
 # deepspeed_config_file="src/chatmed_llama_peft/deepspeed_config_zero3_offload.json"
 
 # torchrun \
@@ -22,14 +22,15 @@ checkpoint="./output/promptcblue-llama-7b-pt-v0/checkpoint-1600"
 python   src/ft_llama_lora/run_clm_pt_with_peft.py \
     --model_name_or_path ${pretrained_model} \
     --tokenizer_name_or_path ${pretrained_model} \
-    --train_file ${data_path}/train.jsonl \
-    --validation_file ${data_path}/dev.jsonl \
+    --peft_path $peft_path \
+    --train_file ${data_path}/train20.jsonl \
+    --validation_file ${data_path}/dev20.jsonl \
     --test_file ${data_path}/testA.jsonl \
     --dataset_cache_dir ${dataset_cache_dir} \
     --validation_split_percentage 0.001 \
     --per_device_train_batch_size ${per_device_batch_size} \
     --per_device_eval_batch_size ${per_device_batch_size} \
-    --do_train \
+    --do_predict \
     --seed 100 \
     --fp16 \
     --max_steps ${training_steps} \
@@ -55,7 +56,6 @@ python   src/ft_llama_lora/run_clm_pt_with_peft.py \
     --lora_dropout ${lora_dropout} \
     --torch_dtype float16
 
-    # --resume_from_checkpoint $checkpoint \
 #   --deepspeed ${deepspeed_config_file} \
 
 #
